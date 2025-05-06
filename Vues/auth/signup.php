@@ -6,8 +6,6 @@
     <title>Sign Up</title>
 </head>
 <body>
-    
-    <!-- sign up  -->
     <h1>Sign Up</h1>
     <form method="POST">
         <label for="nom">Nom:</label>
@@ -32,10 +30,7 @@
     </form>
     <p>Already have an account? <a href="index.php?action=login">Login here</a></p>
     <?php if (isset($error)): ?>
-        <p style="color: red;"><?= htmlspecialchars($error) ?></p>
+        <p><?= htmlspecialchars($error) ?></p>
     <?php endif; ?>
-    
-
-
 </body>
 </html>

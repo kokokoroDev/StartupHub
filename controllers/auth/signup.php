@@ -2,7 +2,7 @@
     require_once __DIR__ . '/../../models/user.php';
     include __DIR__ . '/../../partials/header.php';
 
-    RedirectIfLoggedIn();
+    RedirectToProfileIfLoggedIn();
 
     $error = '';
     $old = [

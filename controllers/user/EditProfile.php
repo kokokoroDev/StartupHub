@@ -1,6 +1,6 @@
 <?php
-    require_once __DIR__  . '/../../models/user.php';
     require_once __DIR__  . '/../../models/session.php';
+    require_once __DIR__  . '/../../models/user.php';
     require_once __DIR__  . '/../../models/project.php';
 
     checkLoggedIn();
@@ -23,15 +23,23 @@
         $email = htmlspecialchars($_POST['email']);
         $Title = htmlspecialchars($_POST['title']);
         $about = htmlspecialchars($_POST['about_me']);
+        $profile_picture_path = $_POST['existing_profile_picture'];
 
         if(isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] == 0) {
             $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif'];
             $file_extension = pathinfo($_FILES['profile_picture']['name'], PATHINFO_EXTENSION);
 
+
             if(in_array($file_extension, $allowed_extensions)) {
                 $new_filename = uniqid() . '.' . $file_extension;
                 move_uploaded_file($_FILES['profile_picture']['tmp_name'], 'uploads/' . $new_filename);
-                $profile_picture_path = '/../../uploads/' . $new_filename;
+                $profile_picture_path = 'uploads/' . $new_filename;
+
+                if(!empty($user['profile_picture']) && file_exists($user['profile_picture']) && $user['profile_picture'] != 'public/images/default.png') {
+                    unlink($user['profile_picture']);
+                }
+
+
             } else {
                 $_SESSION['error'] = "Invalid file type. Only JPG, JPEG, PNG, and GIF files are allowed.";
                 header("Location: index.php?action=editprofile");
@@ -49,6 +57,7 @@
         exit();
     }
 
+    var_dump($user['profile_picture']);
     require __DIR__  . '/../../Vues/User/editprofilevue.php';
 
 ?>

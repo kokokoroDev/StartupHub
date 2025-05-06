@@ -15,7 +15,8 @@
         $conn = getConnection();
         $stmt = $conn->prepare("SELECT * FROM projects WHERE id = ?");
         $stmt->execute([$id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result;
     }
 
     function getProjectCountByUserId($userId) {
@@ -25,23 +26,18 @@
         return $stmt->fetchColumn();
     }
 
-    function getContributionsByUserId($userId){
-        $conn = getConnection();
-        $stmt = $conn->prepare("SELECT count(*) FROM members WHERE user_id = ?");
-        $stmt->execute([$userId]);
-        return $stmt->fetchColumn();
-    }
+    
 
     function get3ProjectsByUserId($userId) {
         $conn = getConnection();
         $stmt = $conn->prepare("SELECT * FROM projects WHERE user_id = ? order by date_creation desc limit 3" );
         $stmt->execute([$userId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+    } 
 
     function get3ContributionsByUserId($userId) {
         $conn = getConnection();
-        $stmt = $conn->prepare("SELECT * FROM members Join projects ON members.project_id = projects.id WHERE members.user_id = ? order by date_creation desc limit 3" );
+        $stmt = $conn->prepare("SELECT members.*, projects.* FROM members Join projects ON members.project_id = projects.id WHERE members.user_id = ? and members.statut = 'accepté' order by date_creation desc limit 3" );
         $stmt->execute([$userId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -56,11 +52,45 @@
         return $stmt->fetchAll();
     }
 
+
     function getSavedCountByUserId($userID){
         $conn = getConnection();
         $stmt = $conn->prepare("SELECT count(*) FROM saved_projects WHERE user_id = ?");
         $stmt->execute([$userID]);
         return $stmt->fetchColumn();
+    }
+
+
+    function InsertProject($userID,$title,$description,$imagePath,$nmbre){
+        $pdo = getConnection();
+        $stmt = $pdo->prepare("INSERT INTO projects (titre, description , image , user_id, membres_voulus) VALUES (?,?,?,?,?)");
+        return $stmt->execute([$title, $description , $imagePath , $userID, $nmbre]);
+        }
+
+    function DeleteProject($ProjectId){
+        $conn = getConnection();
+        $stmt = $conn->prepare("DELETE FROM projects WHERE id = ?");
+        return $stmt->execute([$ProjectId]);
+    }
+
+    function CheckifOwner($ProjectId,$userID){
+        $conn = getConnection();
+        $stmt = $conn->prepare("SELECT count(*) FROM projects WHERE id = ? AND user_id = ?");
+        $stmt->execute([$ProjectId, $userID]);
+        return $stmt->fetchColumn() > 0;
+    }
+
+ 
+    
+
+
+
+    function GetCompencenties(){
+        $conn = getConnection();
+        $stmt = $conn->prepare("SELECT * FROM `competencies`");
+        $stmt->execute();
+        return $stmt->fetchAll();
+
     }
 
 

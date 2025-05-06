@@ -3,17 +3,24 @@
 
     function checkLoggedIn() {
         if (!isset($_SESSION['Loggedin']) || $_SESSION['Loggedin'] !== true) {
-            header('Location: Vues/Login.php');
+            header('Location: index.php?action=login');
             exit();
         }
     }
-    function RedirectIfLoggedIn() {
+    function RedirectToProfileIfLoggedIn() {
         if (isset($_SESSION['Loggedin']) && $_SESSION['Loggedin'] === true) {
             header('Location: index.php?action=profile');
             exit();
         }
     }
 
+
+    function checkLoggedInNoRedirect(){
+        if (!isset($_SESSION['Loggedin']) || $_SESSION['Loggedin'] !== true) {
+            return false;
+        }
+        return true;
+    }
     
     function isprofileowner($id, $userId) {
         return $id === $userId;
@@ -21,9 +28,10 @@
     
     function getUserById($id) {
         $pdo = getConnection();
-        $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
+        $stmt = $pdo->prepare("SELECT nom, prenom, id, profile_picture, title, about_me, adresse, email FROM users WHERE id = ?");
         $stmt->execute([$id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $results = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $results;
     }
     
     function updateProfile($id, $nom, $prenom, $adresse, $email, $title, $about, $profile_picture_path) {
@@ -53,6 +61,14 @@
         } else {
             return false;
         }
+    }
+
+    function GetProjectRealOwner($ProjectId){
+        $conn = getConnection();
+        $stmt = $conn->prepare("SELECT u.nom, u.prenom, u.profile_picture, u.id FROM projects p Join users u
+         On u.id = p.user_id  WHERE p.id = ?");
+        $stmt->execute([$ProjectId]);
+        return $stmt->fetch();
     }
 
 ?>
